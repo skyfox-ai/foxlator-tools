@@ -1,6 +1,19 @@
+#!/usr/bin/env python3.10
+
 import argparse
+import subprocess
 from enum import Enum
+
+import foxlator_lib as fll
+
 from stt_test.parser import parser as stt_parser
+
+
+def parse_description() -> str:
+    interpreter = subprocess.run(
+        ['which', 'python3.10'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+    return f"""foxlator-tools is a help tool that includes useful features for foxlator, 
+        backend library version: {fll.utils.get_version()}, interpreter used: '{interpreter}'"""
 
 
 class Commands(Enum):
@@ -8,8 +21,9 @@ class Commands(Enum):
 
 
 parser = argparse.ArgumentParser(
-    description="foxlator-tools is a help tool that includes useful features for foxlator"
+    description=parse_description()
 )
+
 
 subparsers = parser.add_subparsers(dest='subparser_name')
 subparsers.add_parser(
