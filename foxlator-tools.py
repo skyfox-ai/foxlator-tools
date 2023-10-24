@@ -8,7 +8,7 @@ class Commands(Enum):
 
 
 parser = argparse.ArgumentParser(
-    description="foxltor-tools is a help tool that includes useful features for foxlator"
+    description="foxlator-tools is a help tool that includes useful features for foxlator"
 )
 
 subparsers = parser.add_subparsers(dest='subparser_name')
