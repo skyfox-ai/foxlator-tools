@@ -162,3 +162,6 @@ cython_debug/
 
 # IDE
 .vscode
+
+# models and test files
+bin/stt_test/utils/test_audio

@@ -2,6 +2,7 @@
 
 import argparse
 import subprocess
+import logging
 from enum import Enum
 
 import foxlator_lib as fll
@@ -24,7 +25,11 @@ parser = argparse.ArgumentParser(
     description=parse_description()
 )
 
-
+parser.add_argument('--loglevel',
+                    default='INFO',
+                    type=str,
+                    choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'],
+                    help='Provide logging level (default: INFO)')
 subparsers = parser.add_subparsers(dest='subparser_name')
 subparsers.add_parser(
     Commands.test_stt.value,
@@ -34,6 +39,7 @@ subparsers.add_parser(
 )
 
 args = parser.parse_args()
+logging.basicConfig(level=args.loglevel)
 
 match args.subparser_name:
     case Commands.test_stt.value:

@@ -1,2 +1,3 @@
-autopep8
-foxlator_lib
+autopep8==2.0.4
+foxlator_lib==0.3.0
+wget==3.2
