@@ -1,3 +1,4 @@
 autopep8==2.0.4
-foxlator_lib==0.3.0
+foxlator_lib
 wget==3.2
+requests
