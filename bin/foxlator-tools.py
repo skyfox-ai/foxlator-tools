@@ -37,7 +37,7 @@ args = parser.parse_args()
 
 match args.subparser_name:
     case Commands.test_stt.value:
-        from stt_test.runner import run_stt_test
-        run_stt_test(args)
+        from stt_test.runner import stt_runner
+        stt_runner(args)
     case _:
         pass
