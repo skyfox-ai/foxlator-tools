@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 from .utils.test_data import download_test_audio
 
@@ -12,7 +13,8 @@ def get_stt_provider(provider_name: str):
         case "whisper":
             pass
         case _:
-            print("Provider not found. Use --help to get available STT providers")
+            logging.error(
+                "Provider not found. Use --help to get available STT providers")
 
 
 def stt_runner(args: argparse.Namespace):
