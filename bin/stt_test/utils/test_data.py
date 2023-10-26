@@ -19,10 +19,7 @@ def prepare_audio_dir():
 
 def download_test_audio(type: Literal["clean", "other"]):
     prepare_audio_dir()
-    if type == "clean":
-        url = 'https://www.openslr.org/resources/12/dev-clean.tar.gz'
-    else:
-        url = 'https://www.openslr.org/resources/12/dev-other.tar.gz'
+    url = f'https://www.openslr.org/resources/12/dev-{type}.tar.gz'
     logging.info('Downloading audio files...')
     audio_zip: str = str(wget.download(url))  # type: ignore
     with tarfile.open(audio_zip, "r:gz") as tar:
@@ -31,7 +28,7 @@ def download_test_audio(type: Literal["clean", "other"]):
     remove(audio_zip)
 
 
-def audio_with_transcription(type: Literal["clean", "other"]) -> Dict[str, str]:
+def get_audio_with_transcription(type: Literal["clean", "other"]) -> Dict[str, str]:
     all_speakers_path = path.join(AUDIO_DIR, 'LibriSpeech', f'dev-{type}')
     if not all([path.exists(AUDIO_DIR), path.isdir(AUDIO_DIR), path.exists(all_speakers_path)]):
         logging.warning(f'{AUDIO_DIR} not found. Auto-download starts...')

@@ -43,7 +43,7 @@ logging.basicConfig(level=args.loglevel)
 
 match args.subparser_name:
     case Commands.test_stt.value:
-        from stt_test.runner import stt_runner
-        stt_runner(args)
+        from stt_test.runner import run_stt_test
+        run_stt_test(args)
     case _:
         pass
