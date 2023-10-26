@@ -1,9 +1,9 @@
 import argparse
 import pathlib
 import os
-from .sphinx.parser import parser as sphinx_parser
-from .vosk.parser import parser as vosk_parser
-from .whisper.parser import parser as whisper_parser
+from .stt_providers.sphinx.parser import parser as sphinx_parser
+from .stt_providers.vosk.parser import parser as vosk_parser
+from .stt_providers.whisper.parser import parser as whisper_parser
 
 
 parser = argparse.ArgumentParser()
@@ -21,6 +21,10 @@ parser.add_argument("--raport_dest",
                     type=pathlib.Path,
                     help="Folder to which the report is to be generated",
                     default=os.getcwd())
+
+parser.add_argument("--re-download-samples",
+                    type=bool,
+                    help="If True then the audio test files will be downloaded again")
 
 parser.add_argument("--audio_type",
                     type=str,
