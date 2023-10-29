@@ -1,7 +1,7 @@
 
 import speech_recognition as sr  # type: ignore
 import ast
-from stt_providers.ISTTBase import ISSTBase
+from stt_test.stt_providers.ISTTBase import ISSTBase
 
 
 class Vosk(ISSTBase):
