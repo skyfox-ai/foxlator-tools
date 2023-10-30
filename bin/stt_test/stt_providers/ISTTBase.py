@@ -1,7 +1,10 @@
 import logging
+from pathlib import Path
 from typing import List, Literal, Protocol, TypedDict
 import speech_recognition as sr  # type: ignore
 import time
+from pathlib import Path
+from os import path
 from stt_test.utils.SentenceChecker import SentenceChecker
 from stt_test.utils.test_data import get_audio_with_transcription
 
@@ -15,7 +18,11 @@ class STTResult(TypedDict):
 
 class ISSTBase(Protocol):
 
-    def _prepare_model(self):
+    MODELS: List[str]
+    MODEL_PATH = Path(path.join(path.dirname(
+        path.realpath(__file__)), 'model'))
+
+    def _prepare_model(self, model_size: str):
         """Method for preparing models"""
         ...
 
@@ -27,8 +34,8 @@ class ISSTBase(Protocol):
         # TODO: IMPLEMENT IT
         pass
 
-    def run_analysis(self, audio_type: Literal['clean', 'other'], samples_num: int):
-        self._prepare_model()
+    def run_analysis(self, audio_type: Literal['clean', 'other'], samples_num: int, model: str):
+        self._prepare_model(model)
         recognizer = sr.Recognizer()
         sc = SentenceChecker()
         all_results: List[STTResult] = []

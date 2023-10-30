@@ -1,31 +1,20 @@
 
-from os import path, listdir, remove
+from os import path, listdir
 from pathlib import Path
 from typing import Dict, Literal
-import wget  # type: ignore
-import shutil
-import tarfile
 import logging
+
+from stt_test.utils.files import download_and_extract, prepare_dir
 
 AUDIO_DIR = Path(path.join(path.dirname(
     path.realpath(__file__)), 'test_audio'))
 
 
-def prepare_audio_dir():
-    logging.info(f"test_audio dir preparation...")
-    shutil.rmtree(AUDIO_DIR, ignore_errors=True)
-    AUDIO_DIR.mkdir()
-
-
 def download_test_audio(type: Literal["clean", "other"]):
-    prepare_audio_dir()
+    prepare_dir(AUDIO_DIR)
     url = f'https://www.openslr.org/resources/12/dev-{type}.tar.gz'
-    logging.info('Downloading audio files...')
-    audio_zip: str = str(wget.download(url))  # type: ignore
-    with tarfile.open(audio_zip, "r:gz") as tar:
-        tar.extractall(path=AUDIO_DIR)
-    logging.info(f'\nFile downloaded and extracted to {AUDIO_DIR}')
-    remove(audio_zip)
+    logging.info('Downloading audio files\n')
+    download_and_extract(url, AUDIO_DIR)
 
 
 def get_audio_with_transcription(type: Literal["clean", "other"]) -> Dict[str, str]:
