@@ -5,10 +5,13 @@ from stt_test.stt_providers.ISTTBase import ISSTBase
 
 class Whisper(ISSTBase):
 
-    def _prepare_model(self):
-        # TODO: TO IMPLMENT
+    MODEL_SIZES = ['tiny', 'base', 'small', 'medium', 'large']
+
+    def _init_values(self):
+        pass
+
+    def _before_all(self,  model_size: str):
         pass
 
     def _audio_to_text(self, recognizer: sr.Recognizer, audio: sr.AudioData) -> str:
-        # TODO: TEST IT
         return recognizer.recognize_whisper(audio)  # type: ignore
