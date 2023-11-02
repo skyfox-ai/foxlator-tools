@@ -39,7 +39,7 @@ parser.add_argument("--audio-type",
 
 subparsers = parser.add_subparsers(dest='provider')
 subparsers.add_parser(
-    Sphinx.__name__, parents=[sphinx_parser], add_help=False, help=f"Analyze sphinx STT"
+    Sphinx.__name__, parents=[sphinx_parser], add_help=False, help="Analyze sphinx STT"
 )
 subparsers.add_parser(
     Vosk.__name__, parents=[vosk_parser], add_help=False, help="Analyze vosk STT"

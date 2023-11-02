@@ -15,9 +15,6 @@ class Whisper(ISSTBase):
     MODEL_SIZES = ['tiny', 'base', 'small', 'medium', 'large']
     _model: whisper_provider.Whisper
 
-    def __init__(self) -> None:
-        super().__init__()
-
     def _set_model(self, model_size: str):
         if model_size not in Whisper.MODEL_SIZES:
             raise Exception('Not supported model size')

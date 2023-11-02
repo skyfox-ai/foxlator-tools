@@ -9,7 +9,7 @@ import zipfile
 
 
 def prepare_dir(path: Path):
-    logging.info(f"test_audio dir preparation...")
+    logging.info(f"{path} dir preparation...")
     shutil.rmtree(path, ignore_errors=True)
     path.mkdir()
 
