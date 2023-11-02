@@ -7,7 +7,7 @@ from stt_test.utils.files import download_and_extract, prepare_dir
 from stt_test.stt_providers.ISTTBase import ISSTBase
 import os
 import shutil
-from vosk import Model  # type: ignore
+from vosk import Model, KaldiRecognizer  # type: ignore
 
 
 class Vosk(ISSTBase):
@@ -15,6 +15,7 @@ class Vosk(ISSTBase):
     MODEL_SIZES = ['small', 'medium', 'big', 'large']
     MODEL_PATH = Path(os.path.join(os.path.dirname(
         os.path.realpath(__file__)), 'model'))
+    _model: KaldiRecognizer
 
     def _download_model_and_extract(self, model_size: str):
         match model_size:
@@ -42,12 +43,16 @@ class Vosk(ISSTBase):
             shutil.move(os.path.join(source_dir, file), Vosk.MODEL_PATH)
         shutil.rmtree(source_dir, ignore_errors=True)
 
-    def _before_all(self, model_size: str):
+    def _prepare_model(self, model_size: str):
         self._download_model_and_extract(model_size)
         self._prepare_model_dir()
-        model = Model(str(Vosk.MODEL_PATH))
-        setattr(self._recognizer, 'vosk_model', model)
+        self._model = KaldiRecognizer(Model(str(Vosk.MODEL_PATH)), 16000)
 
-    def _audio_to_text(self, audio: sr.AudioData) -> str:
-        return ast.literal_eval(self._recognizer.recognize_vosk(audio))[  # type: ignore
-            'text']
+    def _before_all(self, model_size: str):
+        self._prepare_model(model_size)
+
+    def _audio_to_text(self, audio: sr.AudioData, language: str | None = None) -> str:
+        self._model.AcceptWaveform(  # type: ignore
+            audio.get_raw_data(convert_rate=16000, convert_width=2))  # type: ignore
+        results: str = str(self._model.FinalResult())  # type: ignore
+        return ast.literal_eval(results)['text']

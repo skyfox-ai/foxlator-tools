@@ -29,7 +29,7 @@ class ISSTBase(Protocol):
         """Method for preparing models"""
         ...
 
-    def _audio_to_text(self, audio: sr.AudioData) -> str:
+    def _audio_to_text(self, audio: sr.AudioData, language: str) -> str:
         """Methods that runs STT on a single audio"""
         ...
 
@@ -39,12 +39,12 @@ class ISSTBase(Protocol):
         with open(f'report_{caller_class}_{model}.json', 'w') as fp:
             json.dump(data, fp)
 
-    def run_analysis(self, file: str, trans: str):
+    def run_analysis(self, file: str, trans: str, language: str):
         with sr.AudioFile(file) as source:
             audio = self._recognizer.record(source)  # type: ignore
         try:
             start_time = time.time()
-            stt_trans = self._audio_to_text(audio)
+            stt_trans = self._audio_to_text(audio, language)
             execution_time = time.time() - start_time
             similarity = self._sc.check_similarity(stt_trans, trans)
             return STTResult(stt_trans=stt_trans, trans=trans, similarity=similarity,
@@ -52,7 +52,7 @@ class ISSTBase(Protocol):
         except sr.UnknownValueError:
             raise Exception('Error while analysing {file}. Skiping ...')
 
-    def run(self, audio_type: Literal['clean', 'other'], samples_num: int, model: str):
+    def run(self, audio_type: Literal['clean', 'other'], samples_num: int, model: str, language: str):
         self._init()
         self._before_all(model)
         all_results: List[STTResult] = []
@@ -62,7 +62,7 @@ class ISSTBase(Protocol):
             file, trans = file_trans
             if len(all_results) == samples_num:
                 break
-            analysis = self.run_analysis(file, trans)
+            analysis = self.run_analysis(file, trans, language)
             logging.info(
                 f"[{i}/{samples_num}] Similarity: {analysis['similarity']}\tTime: {analysis['execution_time']}")
             all_results.append(analysis)
