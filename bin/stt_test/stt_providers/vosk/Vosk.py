@@ -7,7 +7,7 @@ from stt_test.utils.files import download_and_extract, prepare_dir
 from stt_test.stt_providers.ISTTBase import ISSTBase
 import os
 import shutil
-from vosk import Model, KaldiRecognizer  # type: ignore
+from vosk import Model  # type: ignore
 
 
 class Vosk(ISSTBase):
@@ -15,7 +15,6 @@ class Vosk(ISSTBase):
     MODEL_SIZES = ['small', 'medium', 'big', 'large']
     MODEL_PATH = Path(os.path.join(os.path.dirname(
         os.path.realpath(__file__)), 'model'))
-    _recognizer: KaldiRecognizer
 
     def _download_model_and_extract(self, model_size: str):
         match model_size:
@@ -47,13 +46,8 @@ class Vosk(ISSTBase):
         self._download_model_and_extract(model_size)
         self._prepare_model_dir()
         model = Model(str(Vosk.MODEL_PATH))
-        Vosk._recognizer = KaldiRecognizer(model, 16000)
+        setattr(self._recognizer, 'vosk_model', model)
 
-    def _audio_to_text(self, recognizer: sr.Recognizer, audio: sr.AudioData) -> str:
-        # Vosk._recognizer.AcceptWaveform(audio.get_raw_data(  # type: ignore
-        #     convert_rate=16000, convert_width=2))
-
-        # return ast.literal_eval(
-        #     Vosk._recognizer.FinalResult())['text']  # type: ignore
-        return ast.literal_eval(recognizer.recognize_vosk(audio))[  # type: ignore
+    def _audio_to_text(self, audio: sr.AudioData) -> str:
+        return ast.literal_eval(self._recognizer.recognize_vosk(audio))[  # type: ignore
             'text']

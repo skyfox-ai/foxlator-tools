@@ -21,5 +21,5 @@ def run_stt_test(args: argparse.Namespace):
     if args.provider:
         provider = get_stt_provider(args.provider)
         model = args.model if "model" in args else ''
-        provider.run_analysis(args.audio_type, args.samples_num, model)
+        provider.run(args.audio_type, args.samples_num, model)
     print(args)
