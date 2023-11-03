@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, Literal
 import logging
 
-from stt_test.utils.files import download_and_extract, prepare_dir
+from stt_test.utils.file_utils import download_and_extract, prepare_dir
 
 AUDIO_DIR = Path(path.join(path.dirname(
     path.realpath(__file__)), 'test_audio'))
@@ -20,7 +20,7 @@ def download_test_audio(type: Literal["clean", "other"]):
 def get_audio_with_transcription(type: Literal["clean", "other"]) -> Dict[str, str]:
     all_speakers_path = path.join(AUDIO_DIR, 'LibriSpeech', f'dev-{type}')
     if not all([path.exists(AUDIO_DIR), path.isdir(AUDIO_DIR), path.exists(all_speakers_path)]):
-        logging.warning(f'{AUDIO_DIR} not found. Auto-download starts...')
+        logging.warning('%s not found. Auto-download starts...', AUDIO_DIR)
         download_test_audio(type)
     audo_files: Dict[str, str] = {}
     logging.info(

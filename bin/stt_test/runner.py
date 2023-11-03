@@ -1,18 +1,23 @@
 import argparse
 import logging
-from importlib import import_module
-from .stt_providers.ISTTBase import ISSTBase
+from .stt_providers.ISTTBase import ISTT
 from .utils.test_data import download_test_audio
+from .stt_providers.sphinx.Sphinx import Sphinx
+from .stt_providers.vosk.Vosk import Vosk
+from .stt_providers.whisper.Whisper import Whisper
 
 
-def get_stt_provider(provider_name: str) -> ISSTBase:
-    try:
-        module = import_module(
-            f"stt_test.stt_providers.{provider_name.lower()}.{provider_name}")
-        return getattr(module, provider_name)()
-    except Exception as e:
-        logging.error(e)
-        exit()
+def get_stt_provider(provider_name: str) -> ISTT:
+    match(provider_name):
+        case Sphinx.__name__:
+            return Sphinx()
+        case Vosk.__name__:
+            return Vosk()
+        case Whisper.__name__:
+            return Whisper()
+        case _:
+            logging.error("Incorrect provider delivered: %s", provider_name)
+            exit()
 
 
 def run_stt_test(args: argparse.Namespace):

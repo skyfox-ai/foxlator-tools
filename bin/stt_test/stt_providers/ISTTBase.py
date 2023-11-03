@@ -5,7 +5,6 @@ import speech_recognition as sr  # type: ignore
 import time
 from stt_test.utils.SentenceChecker import SentenceChecker
 from stt_test.utils.test_data import get_audio_with_transcription
-import inspect
 
 
 class STTResult(TypedDict):
@@ -15,17 +14,18 @@ class STTResult(TypedDict):
     execution_time: float
 
 
-class ISSTBase(Protocol):
+class ISTT(Protocol):
 
     MODEL_SIZES: List[str]
     _sc: SentenceChecker
     _recognizer: sr.Recognizer
 
-    def _init(self):
+    def _init(self, model_size: str):
         self._sc = SentenceChecker()
         self._recognizer = sr.Recognizer()
+        self._prepare_model(model_size)
 
-    def _before_all(self, model_size: str):
+    def _prepare_model(self, model_size: str):
         """Method for preparing models"""
         ...
 
@@ -33,10 +33,8 @@ class ISSTBase(Protocol):
         """Methods that runs STT on a single audio"""
         ...
 
-    def _save_results(self, data: List[STTResult], model: str):
-        stack = inspect.stack()
-        caller_class = stack[1][0].f_locals["self"].__class__.__name__
-        with open(f'report_{caller_class}_{model}.json', 'w') as fp:
+    def _save_results(self, data: List[STTResult], model_size: str):
+        with open(f'report_{self.__class__.__name__}_{model_size}.json', 'w') as fp:
             json.dump(data, fp)
 
     def run_analysis(self, file: str, trans: str, language: str):
@@ -49,12 +47,11 @@ class ISSTBase(Protocol):
             similarity = self._sc.check_similarity(stt_trans, trans)
             return STTResult(stt_trans=stt_trans, trans=trans, similarity=similarity,
                              execution_time=execution_time)
-        except sr.UnknownValueError:
-            raise Exception('Error while analysing {file}. Skiping ...')
+        except sr.UnknownValueError as e:
+            raise Exception(f'Error while analysing {file}.\n{e}\nSkiping ...')
 
-    def run(self, audio_type: Literal['clean', 'other'], samples_num: int, model: str, language: str):
-        self._init()
-        self._before_all(model)
+    def run(self, audio_type: Literal['clean', 'other'], samples_num: int, model_size: str, language: str):
+        self._init(model_size)
         all_results: List[STTResult] = []
         audio_with_trans = get_audio_with_transcription(audio_type)
         samples_num = samples_num if samples_num else len(audio_with_trans)
@@ -64,6 +61,6 @@ class ISSTBase(Protocol):
                 break
             analysis = self.run_analysis(file, trans, language)
             logging.info(
-                f"[{i}/{samples_num}] Similarity: {analysis['similarity']}\tTime: {analysis['execution_time']}")
+                "[%d/%d] Similarity: %s\tTime: %s", i, samples_num, analysis['similarity'], analysis['execution_time'])
             all_results.append(analysis)
-        self._save_results(all_results, model)
+        self._save_results(all_results, model_size)

@@ -1,15 +1,14 @@
 
 # type: ignore
 import speech_recognition as sr
-from stt_test.stt_providers.ISTTBase import ISSTBase
+from stt_test.stt_providers.ISTTBase import ISTT
 from pocketsphinx import pocketsphinx, Jsgf, FsgModel
 import os
 import site
 
 
-class Sphinx(ISSTBase):
+class Sphinx(ISTT):
 
-    MODEL_SIZES = []
     _model: pocketsphinx.Decoder
 
     def _prepare_model(self, model_size, language: str = 'en-US'):
@@ -28,9 +27,6 @@ class Sphinx(ISSTBase):
         config.set_string("-dict", phoneme_dictionary_file)
         config.set_string("-logfn", os.devnull)
         self._model = pocketsphinx.Decoder(config)
-
-    def _before_all(self, model_size: str, language: str = 'en-US'):
-        self._prepare_model(model_size, language)
 
     def _audio_to_text(self, audio: sr.AudioData, language: str | None = None) -> str:
         raw_data = audio.get_raw_data(convert_rate=16000, convert_width=2)

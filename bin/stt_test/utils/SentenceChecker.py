@@ -1,6 +1,7 @@
 import spacy
-import subprocess
 import logging
+import sys
+import os
 
 
 class SentenceChecker:
@@ -9,20 +10,16 @@ class SentenceChecker:
         self.nlp = self._get_spacy_nlp(model_name)
 
     def _get_spacy_nlp(self, model_name: str):
-        try:
+        if spacy.util.is_package(model_name):
             return spacy.load(model_name)
-        except OSError:
-            logging.info("Spacy model not found. Downloading...")
-            try:
-                self._download_model(model_name)
-                return spacy.load(model_name)
-            except subprocess.CalledProcessError:
-                raise Exception(
-                    "Error while downloading the model. Check the connection and try again")
+        self._download_model(model_name)
+        return spacy.load(model_name)
 
     def _download_model(self, model_name: str):
-        subprocess.run(
-            f"python -m spacy download {model_name}", shell=True, check=True)
+        status = os.system(f"{sys.executable} -m spacy download {model_name}")
+        if status != 0:
+            raise Exception(
+                "Error while downloading the sentence checker model")
         logging.info(f"Download completed")
 
     def check_similarity(self, sentence_1: str, sentence_2: str):

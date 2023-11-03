@@ -9,7 +9,7 @@ import zipfile
 
 
 def prepare_dir(path: Path):
-    logging.info(f"{path} dir preparation...")
+    logging.info("preparing %s dir", path)
     shutil.rmtree(path, ignore_errors=True)
     path.mkdir()
 
@@ -22,5 +22,5 @@ def download_and_extract(url: str, extract_dir: Path):
     else:
         with tarfile.open(package, "r:gz") as tar:
             tar.extractall(path=extract_dir)
-    logging.info(f'\nFile downloaded and extracted to {extract_dir}')
+    logging.info('\nFile downloaded and extracted to %s', extract_dir)
     remove(package)
