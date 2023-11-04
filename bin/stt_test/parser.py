@@ -1,6 +1,10 @@
 import argparse
 import pathlib
 import os
+
+from .stt_providers.sphinx.Sphinx import Sphinx
+from .stt_providers.vosk.Vosk import Vosk
+from .stt_providers.whisper.Whisper import Whisper
 from .stt_providers.sphinx.parser import parser as sphinx_parser
 from .stt_providers.vosk.parser import parser as vosk_parser
 from .stt_providers.whisper.parser import parser as whisper_parser
@@ -35,11 +39,11 @@ parser.add_argument("--audio-type",
 
 subparsers = parser.add_subparsers(dest='provider')
 subparsers.add_parser(
-    'sphinx', parents=[sphinx_parser], add_help=False, help="Analyze sphinx STT"
+    Sphinx.__name__, parents=[sphinx_parser], add_help=False, help="Analyze sphinx STT"
 )
 subparsers.add_parser(
-    'vosk', parents=[vosk_parser], add_help=False, help="Analyze vosk STT"
+    Vosk.__name__, parents=[vosk_parser], add_help=False, help="Analyze vosk STT"
 )
 subparsers.add_parser(
-    'whisper', parents=[whisper_parser], add_help=False, help="Analyze whisper STT"
+    Whisper.__name__, parents=[whisper_parser], add_help=False, help="Analyze whisper STT"
 )

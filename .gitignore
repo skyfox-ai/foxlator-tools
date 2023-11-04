@@ -165,3 +165,8 @@ cython_debug/
 
 # models and test files
 bin/stt_test/utils/test_audio
+**/*/model
+
+# artifacts
+**/*/report_*.json
+**/*/*.tmp

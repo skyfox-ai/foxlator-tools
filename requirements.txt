@@ -2,3 +2,7 @@ autopep8==2.0.4
 foxlator_lib
 wget==3.2
 requests
+spycy==3.7.2
+soundfile==0.12.1
+
+
