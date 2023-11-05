@@ -5,6 +5,7 @@ import speech_recognition as sr  # type: ignore
 import time
 from stt_test.utils.SentenceChecker import SentenceChecker
 from stt_test.utils.test_data import get_audio_with_transcription
+import os
 
 
 class STTResult(TypedDict):
@@ -33,8 +34,10 @@ class ISTT(Protocol):
         """Methods that runs STT on a single audio"""
         ...
 
-    def _save_results(self, data: List[STTResult], model_size: str):
-        with open(f'report_{self.__class__.__name__}_{model_size}.json', 'w') as fp:
+    def _save_results(self, data: List[STTResult], model_size: str, report_dir: str):
+        if not os.path.exists(report_dir):
+            os.makedirs(report_dir)
+        with open(os.path.join(report_dir, f'report_{self.__class__.__name__}_{model_size}.json'), 'w') as fp:
             json.dump(data, fp)
 
     def run_analysis(self, file: str, trans: str, language: str):
@@ -42,7 +45,7 @@ class ISTT(Protocol):
             audio = self._recognizer.record(source)  # type: ignore
         try:
             start_time = time.time()
-            stt_trans = self._audio_to_text(audio, language)
+            stt_trans = self._audio_to_text(audio, language).lower()
             execution_time = time.time() - start_time
             similarity = self._sc.check_similarity(stt_trans, trans)
             return STTResult(stt_trans=stt_trans, trans=trans, similarity=similarity,
@@ -50,7 +53,7 @@ class ISTT(Protocol):
         except sr.UnknownValueError as e:
             raise Exception(f'Error while analysing {file}.\n{e}\nSkiping ...')
 
-    def run(self, audio_type: Literal['clean', 'other'], samples_num: int, model_size: str, language: str):
+    def run(self, audio_type: Literal['clean', 'other'], samples_num: int, model_size: str, language: str, report_dir: str):
         self._init(model_size)
         all_results: List[STTResult] = []
         audio_with_trans = get_audio_with_transcription(audio_type)
@@ -59,8 +62,8 @@ class ISTT(Protocol):
             file, trans = file_trans
             if len(all_results) == samples_num:
                 break
-            analysis = self.run_analysis(file, trans, language)
+            analysis = self.run_analysis(file, trans.lower(), language)
             logging.info(
                 "[%d/%d] Similarity: %s\tTime: %s", i, samples_num, analysis['similarity'], analysis['execution_time'])
             all_results.append(analysis)
-        self._save_results(all_results, model_size)
+        self._save_results(all_results, model_size, report_dir)
