@@ -13,7 +13,7 @@ from .stt_providers.whisper.Whisper import Whisper
 
 
 def _get_stt_provider(provider_name: str) -> ISTT:
-    match(provider_name):
+    match provider_name:
         case Sphinx.__name__:
             return Sphinx()
         case Vosk.__name__:

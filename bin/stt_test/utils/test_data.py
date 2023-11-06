@@ -1,7 +1,7 @@
 
 from os import path, listdir
 from pathlib import Path
-from typing import Any, Dict, Generator, Literal
+from typing import Any, Generator, Literal
 import logging
 
 from stt_test.utils.file_utils import download_and_extract, prepare_dir

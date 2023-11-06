@@ -170,4 +170,6 @@ bin/stt_test/utils/test_audio
 # artifacts
 **/*/report_*.json
 **/*/*.tmp
-**/*.*.xlsx
+**/*/*.xlsx
+**/*/*.tar.gz
+**/*/*.zip

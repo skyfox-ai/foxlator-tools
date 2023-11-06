@@ -22,7 +22,7 @@ parser.add_argument("--samples-num",
 
 parser.add_argument("--report-dir",
                     type=pathlib.Path,
-                    help="Folder to which the report is to be generated")
+                    help="Folder that should contain reports")
 
 parser.add_argument("--redownload-samples",
                     action="store_true",
