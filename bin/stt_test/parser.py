@@ -1,6 +1,5 @@
 import argparse
 import pathlib
-import os
 
 from .stt_providers.sphinx.Sphinx import Sphinx
 from .stt_providers.vosk.Vosk import Vosk
@@ -21,10 +20,9 @@ parser.add_argument("--samples-num",
                     type=int,
                     help="Number of audio files to be analyzed")
 
-parser.add_argument("--raport-dest",
+parser.add_argument("--report-dir",
                     type=pathlib.Path,
-                    help="Folder to which the report is to be generated",
-                    default=os.getcwd())
+                    help="Folder that should contain reports")
 
 parser.add_argument("--redownload-samples",
                     action="store_true",
@@ -36,8 +34,12 @@ parser.add_argument("--audio-type",
                     default='clean',
                     help="Audio type based on https://www.openslr.org/12")
 
+parser.add_argument("--create-general-report",
+                    action="store_true",
+                    help="Create general raport from all STT reports")
 
-subparsers = parser.add_subparsers(dest='provider')
+
+subparsers = parser.add_subparsers(dest='provider', metavar="")
 subparsers.add_parser(
     Sphinx.__name__, parents=[sphinx_parser], add_help=False, help="Analyze sphinx STT"
 )
@@ -46,4 +48,7 @@ subparsers.add_parser(
 )
 subparsers.add_parser(
     Whisper.__name__, parents=[whisper_parser], add_help=False, help="Analyze whisper STT"
+)
+subparsers.add_parser(
+    "ALL", add_help=False, help="Runs all STT analysis"
 )
