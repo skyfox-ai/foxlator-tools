@@ -1,7 +1,7 @@
 
 from os import path, listdir
 from pathlib import Path
-from typing import Dict, Literal
+from typing import Any, Dict, Generator, Literal
 import logging
 
 from stt_test.utils.file_utils import download_and_extract, prepare_dir
@@ -17,12 +17,11 @@ def download_test_audio(type: Literal["clean", "other"]):
     download_and_extract(url, AUDIO_DIR)
 
 
-def get_audio_with_transcription(type: Literal["clean", "other"]) -> Dict[str, str]:
+def get_audio_with_transcription(type: Literal["clean", "other"]) -> Generator[tuple[str, str], Any, Any]:
     all_speakers_path = path.join(AUDIO_DIR, 'LibriSpeech', f'dev-{type}')
     if not all([path.exists(AUDIO_DIR), path.isdir(AUDIO_DIR), path.exists(all_speakers_path)]):
         logging.warning('%s not found. Auto-download starts...', AUDIO_DIR)
         download_test_audio(type)
-    audo_files: Dict[str, str] = {}
     logging.info(
         'Mapping the transcription of the recording and the path to it...')
     for speaker_id in listdir(all_speakers_path):
@@ -34,6 +33,4 @@ def get_audio_with_transcription(type: Literal["clean", "other"]) -> Dict[str, s
             for line in trans_file:
                 audio_file_name, transcription = line.split(" ", 1)
                 filepath = f"{path.join(chapter_path, audio_file_name)}.flac"
-                audo_files[filepath] = transcription
-    logging.info('Mapping has finished')
-    return audo_files
+                yield filepath, transcription

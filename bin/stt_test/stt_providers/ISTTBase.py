@@ -3,6 +3,7 @@ import logging
 from typing import List, Literal, Protocol, TypedDict
 import speech_recognition as sr  # type: ignore
 import time
+from typing_extensions import Unpack, NotRequired
 from stt_test.utils.SentenceChecker import SentenceChecker
 from stt_test.utils.test_data import get_audio_with_transcription
 import os
@@ -15,16 +16,32 @@ class STTResult(TypedDict):
     execution_time: float
 
 
+class STTRunParams(TypedDict):
+    audio_type: Literal['clean', 'other']
+    samples_num: int
+    model_size: str
+    language: str
+    report_dir: str
+    recognizer: NotRequired[sr.Recognizer]
+    sentence_checker: NotRequired[SentenceChecker]
+
+
 class ISTT(Protocol):
 
-    MODEL_SIZES: List[str]
+    MODEL_SIZES: List[str] = []
     _sc: SentenceChecker
     _recognizer: sr.Recognizer
 
-    def _init(self, model_size: str):
-        self._sc = SentenceChecker()
-        self._recognizer = sr.Recognizer()
-        self._prepare_model(model_size)
+    def _init(self, **kwargs: Unpack[STTRunParams]):
+        self._prepare_model(kwargs['model_size'])
+        if 'sentence_checker' in kwargs:
+            self._sc = kwargs['sentence_checker']
+        else:
+            self._sc = SentenceChecker()
+        if 'recognizer' in kwargs:
+            self._recognizer = kwargs['recognizer']
+        else:
+            self._recognizer = sr.Recognizer()
 
     def _prepare_model(self, model_size: str):
         """Method for preparing models"""
@@ -53,17 +70,21 @@ class ISTT(Protocol):
         except sr.UnknownValueError as e:
             raise Exception(f'Error while analysing {file}.\n{e}\nSkiping ...')
 
-    def run(self, audio_type: Literal['clean', 'other'], samples_num: int, model_size: str, language: str, report_dir: str):
-        self._init(model_size)
+    def run(self, **kwargs: Unpack[STTRunParams]):
+        self._init(**kwargs)
         all_results: List[STTResult] = []
-        audio_with_trans = get_audio_with_transcription(audio_type)
-        samples_num = samples_num if samples_num else len(audio_with_trans)
-        for i, file_trans in enumerate(audio_with_trans.items()):
+        audio_with_trans = get_audio_with_transcription(kwargs['audio_type'])
+        samples_num = kwargs['samples_num']
+        samples_num = samples_num if samples_num else len(
+            list(audio_with_trans))
+        for i, file_trans in enumerate(audio_with_trans):
             file, trans = file_trans
             if len(all_results) == samples_num:
                 break
-            analysis = self.run_analysis(file, trans.lower(), language)
+            analysis = self.run_analysis(
+                file, trans.lower(), kwargs['language'])
             logging.info(
                 "[%d/%d] Similarity: %s\tTime: %s", i, samples_num, analysis['similarity'], analysis['execution_time'])
             all_results.append(analysis)
-        self._save_results(all_results, model_size, report_dir)
+        self._save_results(
+            all_results, kwargs['model_size'], kwargs['report_dir'])

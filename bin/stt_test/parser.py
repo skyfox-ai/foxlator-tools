@@ -49,3 +49,6 @@ subparsers.add_parser(
 subparsers.add_parser(
     Whisper.__name__, parents=[whisper_parser], add_help=False, help="Analyze whisper STT"
 )
+subparsers.add_parser(
+    "ALL", add_help=False, help="Runs all STT analysis"
+)

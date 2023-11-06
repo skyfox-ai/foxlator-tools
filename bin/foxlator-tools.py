@@ -60,6 +60,7 @@ check_version()
 
 args = parser.parse_args()
 logging.basicConfig(level=args.loglevel)
+logging.root.setLevel(args.loglevel)
 
 match args.subparser_name:
     case Commands.test_stt.value:
