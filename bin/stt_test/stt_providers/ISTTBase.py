@@ -76,7 +76,7 @@ class ISTT(Protocol):
         audio_with_trans = get_audio_with_transcription(kwargs['audio_type'])
         samples_num = kwargs['samples_num']
         samples_num = samples_num if samples_num else len(
-            list(audio_with_trans))
+            list(get_audio_with_transcription(kwargs['audio_type'])))
         for i, file_trans in enumerate(audio_with_trans):
             file, trans = file_trans
             if len(all_results) == samples_num:

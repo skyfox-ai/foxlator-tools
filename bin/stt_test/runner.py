@@ -49,7 +49,8 @@ def _run_all(args: argparse.Namespace, report_dir: str):
 def run_stt_test(args: argparse.Namespace):
     if args.redownload_samples:
         download_test_audio(args.audio_type)
-    report_dir = os.path.join(os.getcwd(), args.report_dir)
+    report_dir = os.path.join(
+        os.getcwd(), args.report_dir) if args.report_dir else os.getcwd()
     if args.provider:
         if args.provider == "ALL":
             _run_all(args, report_dir)
